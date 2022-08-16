@@ -1,0 +1,216 @@
+﻿@using ZavrsniSeminarskiRad.Models.Dbo
+@using ZavrsniSeminarskiRad.Models.ViewModels
+@using ZavrsniSeminarskiRad.Services.Interfaces
+@using Microsoft.AspNetCore.Identity
+@model ShoppingBasketViewModel
+@inject SignInManager<AppUser> SignInManager
+@inject UserManager<AppUser> UserManager
+@inject ICustomerService customerService
+
+
+@{
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var user = await UserManager.GetUserAsync(User);
+    var adress = await customerService.GetAddress(user.Id);
+
+    decimal totalPrice = 0;
+    decimal totalPriceWithVat = 0;
+    string documentId = string.Empty;
+
+
+    if (Model != null)
+    {
+        totalPrice = Model.GetTotalPrice();
+        totalPriceWithVat = Model.GetTotalPriceWithVAT();
+        documentId = Model.Id + "-" + Model.Created.ToString("dd-MM-yyyy");
+    }
+
+    int counter = 1;
+}
+
+@section Scripts{
+    <script>
+        function TrigerModal() {
+            console.log("modal aktiviran!");
+            $('#mojModal').modal('show');
+        }
+
+        function HideModal() {
+            $('#mojModal').modal('hide');
+        }
+
+    </script>
+}
+
+
+    <div class="container">
+
+        @if (Model != null)
+    {
+
+        
+    @section modalSection{
+    <div class="modal" id="mojModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Storniranje</h5>
+
+                </div>
+                <div class="modal-body">
+                    <p>Stvarno obrisat?</p>
+                </div>
+                <div class="modal-footer">
+                    @Html.ActionLink("Potvrdi", "SuspendShoppingBasket", new {  id=Model.Id  },new {@class= "btn btn-danger"})
+                    @*             <button type="button" class="btn btn-primary">Save changes</button>*@
+                    <button type="button" class="btn btn-secondary" onclick="HideModal()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+
+
+
+        string documentStatus = Model.ShoppingBasketStatus.ToString();
+
+        <div class="card">
+            <div class="card-header">
+                Košarica
+                <strong>@documentId</strong>
+                <span class="float-right"> <strong>Status:</strong> @documentStatus</span>
+
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-sm-6">
+                        <h6 class="mb-3">Kupac:</h6>
+                        <div>
+                            <strong>@user.Name @user.Sourname</strong>
+                        </div>
+                        <div>@adress.City</div>
+                        <div>@adress.Street</div>
+                        <div>Email: @user.Email</div>
+                        <div>Phone: @user.PhoneNumber</div>
+                    </div>
+                </div>
+
+                <div class="table-responsive-sm">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th class="center">#</th>
+                                <th>Naziv</th>
+                                <th>Opis</th>
+                                <th class="right">Kategorija</th>
+                                <th class="center">Količina</th>
+                                <th class="right">Cijena</th>
+                                <th class="right">Ukloni artikl</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            @foreach (var item in Model.ShoppingBasketItems)
+                            {
+                                <tr>
+                                    <td class="center">@counter</td>
+                                    <td class="left strong">@item.Item.Title</td>
+                                    <td class="left">@item.Item.Description</td>
+
+                                    <td class="right">@item.Item.ItemCategory.Title</td>
+                                    <td class="center">@item.Quantity</td>
+                                    <td class="right">@item.Price</td>
+                                    <td>    @Html.ActionLink("Ukloni", "SuspendShoppingBasketItem", new {  id=item.Id  },new {@class= "btn btn-danger"})</td>
+                                </tr>
+
+                                counter++;
+                            }
+
+
+
+
+
+
+
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row">
+                    @*            <div class="col-lg-4 col-sm-5">
+                </div>*@
+
+                    <div class="col-lg-4 col-sm-5 ml-auto">
+                        <table class="table table-clear">
+                            <tbody>
+                                <tr>
+                                    <td class="left">
+                                        <strong>Neto</strong>
+                                    </td>
+                                    <td class="right">@string.Format("{0:C}",totalPrice)</td>
+                                </tr>
+                                <tr>
+                                    <td class="left">
+                                        <strong>Discount (20%)</strong>
+                                    </td>
+                                    <td class="right">0</td>
+                                </tr>
+                                <tr>
+                                    <td class="left">
+                                        <strong>VAT (10%)</strong>
+                                    </td>
+                                    <td class="right">@string.Format("{0:C}",(totalPriceWithVat-totalPrice))</td>
+                                </tr>
+                                <tr>
+                                    <td class="left">
+                                        <strong>Total</strong>
+                                    </td>
+                                    <td class="right">
+                                        <strong>@string.Format("{0:C}",totalPriceWithVat)</strong>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="row mt-5">
+                    <div class="col-lg-1 col-sm-5 ml-auto">
+                        @if (Model != null)
+                        {
+                            using (Html.BeginForm())
+                            {
+                                <input type="text" name="ShoppingBasketId" value="@Model.Id" hidden>
+                                <input type="submit" class="btn btn-success" value="Kupi">
+
+                            }
+                        }
+                    </div>
+                    <div class="col-lg-1 col-sm-5 ml-auto">
+                        <button type="button" class="btn btn-danger" onclick="TrigerModal()">Storno</button>
+                        @*           @Html.ActionLink("Storno", "SuspendShoppingCart", new {  id=Model.Id  },new {@class= "btn btn-danger"})*@
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    }
+
+
+    else
+    {
+        <div class="card">
+            <h5 class="card-header">Košarica je prazna</h5>
+            <div class="card-body">
+                <h5 class="card-title">Molimo napuniti košaricu za pregled</h5>
+                <p class="card-text">Pogledajte našu ponudu!</p>
+                @Html.ActionLink("Ponuda","Index","Home",null,new {@class = "btn btn-primary"})
+
+            
+            </div>
+        </div>
+    }
+
+</div>

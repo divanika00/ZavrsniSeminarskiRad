@@ -1,0 +1,67 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using ZavrsniSeminarskiRad.Models.Dbo
+@using ZavrsniSeminarskiRad.Services.Interfaces
+@inject SignInManager<AppUser> SignInManager
+@inject UserManager<AppUser> UserManager
+@inject IAppUserService appUserService
+
+@{
+    var myuser = await appUserService.GetUser(User);
+    var user = await UserManager.GetUserAsync(User);
+}
+
+
+<ul class="navbar-nav">
+    @if (user != null)
+
+    {
+
+
+        var userRole = await UserManager.GetRolesAsync(user);
+        
+
+
+        @switch (userRole[0])
+        {
+            case Roles.Admin:
+
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="@Url.Action("ItemAdministration", "Admin")">Upravljaj proizvodima</a>
+
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="@Url.Action("Users", "Admin")">Upravljaj korisnike</a>
+
+                </li>
+                
+                break;
+                case Roles.Employee:
+                case Roles.BasicUser:
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="@Url.Action("ShoppingBasket", "Home")">Košarica</a>
+
+                </li>
+                break;
+
+        }
+
+
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">@userRole[0] @user.Name @user.Sourname!</a>
+        </li>
+        <li class="nav-item">
+            <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                <button type="submit" class="nav-link btn btn-link text-dark">Logout</button>
+            </form>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="nav-link text-dark" href="@Url.Action("Registration", "AppUser")">Registracija</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Prijava</a>
+        </li>
+    }
+</ul>

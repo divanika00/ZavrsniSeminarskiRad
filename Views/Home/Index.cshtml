@@ -1,0 +1,51 @@
+﻿@using ZavrsniSeminarskiRad.Models.ViewModels
+
+@model List<ItemViewModel>
+@{
+    int counter = 1;
+}
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Naziv</th>
+            <th scope="col">Opis</th>
+            <th scope="col">Cijena</th>
+            <th scope="col">Detalji</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var item in Model.OrderBy(x=> Guid.NewGuid()))
+        {
+            decimal price = item.Price * 1.25M;
+
+            <tr>
+                <th scope="row">@counter</th>
+                <td>@item.Title</td>
+                <td>@item.Description</td>
+                <td>@string.Format("{0:C}",price)</td>
+                <td>
+                    @if(item.Quantity > 0)
+                    {
+                        <a href="@Url.Action("ItemView", "Home",new {id = item.Id})" class="btn btn-success">Detalji</a>
+                    }
+                    else
+                    {
+                        <span>Proizvod nije dostupan</span>
+                    }
+
+                </td>
+                <td>
+                    <img src="@item.ProductImgUrl" alt="@item.Title">
+                </td>
+
+            </tr>
+            counter++;
+        }
+
+
+
+    </tbody>
+</table>

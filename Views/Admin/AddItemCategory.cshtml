@@ -1,0 +1,59 @@
+﻿@using ZavrsniSeminarskiRad.Models.Binding
+@model ItemCategoryBinding
+
+@{
+    ViewData["Title"] = "AddProductCategory";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>AddProductCategory</h1>
+
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h4>ProductCategoryBinding</h4>
+            </div>
+            <div class="card-body">
+                <form asp-action="AddProductCategory">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <label asp-for="Title" class="control-label"></label>
+                        <input asp-for="Title" class="form-control" />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        @* @Html.LabelFor(x=>x.Description, new{@class = "control-label"} )*@
+                        <label asp-for="Description" class="control-label"></label>
+                        @*      @Html.TextBoxFor(x=>x.Description, new{@class = "control-label"})*@
+                        <input asp-for="Description" class="form-control" />
+                        @*  @Html.ValidationMessageFor(x=>x.Description,"Obavezan unos!", new {@class = "text-danger"} )*@
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" value="Create" class="btn btn-primary" />
+                        <a class="btn btn-primary" href="@Url.Action("ItemAdministration", "Admin")">
+                            Return<span class='bi bi-arrow-return-left'></span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-return-left" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M14.5 1.5a.5.5 0 0 1 .5.5v4.8a2.5 2.5 0 0 1-2.5 2.5H2.707l3.347 3.346a.5.5 0 0 1-.708.708l-4.2-4.2a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 8.3H12.5A1.5 1.5 0 0 0 14 6.8V2a.5.5 0 0 1 .5-.5z" />
+                            </svg>
+                        </a>
+                    </div>
+                </form>
+                <div class="card-footer">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    }

@@ -1,0 +1,80 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using ZavrsniSeminarskiRad.Models.Dbo
+@using ZavrsniSeminarskiRad.Models.ViewModels
+@using ZavrsniSeminarskiRad.Services.Interfaces
+
+@inject UserManager<AppUser> UserManager
+@inject IItemService itemService
+@model ItemViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var user = await UserManager.GetUserAsync(User);
+    var shoppingCart = await itemService.GetShoppingBasketAsync(user.Id);
+}
+
+@using (Html.BeginForm())
+{
+    <h1>Proizvod</h1>
+    <input type="text" readonly hidden value="@Model.Id" name="ItemId">
+    @if (shoppingCart != null)
+    {
+        <input type="text" readonly hidden value="@shoppingCart.Id" name="ShoppingBasketId">
+    }
+    <div>
+        <h4>Detalji</h4>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Title)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Title)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Description)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Description)
+            </dd>
+            <dt class="col-sm-2">
+                Kategorija
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model =>  model.ItemCategory.Title)
+            </dd>
+            <div>
+                @Html.DisplayFor(model => model.ProductImgUrl)
+              
+            </div>
+
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Quantity)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.DisplayFor(model => model.Quantity)
+            </dd>
+            <dt class="col-sm-2">
+                @Html.DisplayNameFor(model => model.Price)
+            </dt>
+            <dd class="col-sm-10">
+                @Html.TextBoxFor(model => model.Price,new {@readonly = true, @class = "form-control readonly"})
+            </dd>
+            <dt class="col-sm-2">
+                Dodaj količinu
+            </dt>
+            <dd class="col-sm-10">
+                <select name="Quantity" class="form-select" aria-label="Default select example">
+                    @for (int i = 1; i <= Model.Quantity; i++)
+                    {
+                        <option value="@i">
+                            @i
+                        </option>
+                    }
+                </select>
+            </dd>
+        </dl>
+
+        <input type="submit" value="Pošalji" class="btn btn-success">
+    </div>
+
+}

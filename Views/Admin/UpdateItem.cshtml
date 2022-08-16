@@ -1,0 +1,89 @@
+﻿@using ZavrsniSeminarskiRad.Models.Binding
+@using ZavrsniSeminarskiRad.Services.Interfaces
+@model ItemUpdateBinding
+@inject IItemService itemService;
+
+
+@{
+    ViewData["Title"] = "UpdateItem";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var categorys = await itemService.GetItemCategorysAsync();
+
+}
+
+<h1>UpdateProduct</h1>
+
+<h4>ProductUpdateBinding</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="UpdateItem">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Id" class="control-label"></label>
+                <input asp-for="Id" class="form-control" />
+                <span asp-validation-for="Id" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Title" class="control-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Quantity" class="control-label"></label>
+                @*               <input asp-for="Quantity" class="form-control" />*@
+                <input type="number" step=".01" name="Quantity" class="form-control" value="@Model.Quantity.ToString().Replace(",",".")" />
+                <span asp-validation-for="Quantity" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Price" class="control-label"></label>
+                @*        <input asp-for="Price"  type="number"  class="form-control" />*@
+                <input type="number" step="any" name="Price" class="form-control" value="@Model.Price.ToString().Replace(",",".")" />
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ItemCategoryId" class="control-label">Odabei kategoriju</label>
+                <select name="ItemCategoryId" class="form-select" aria-label="Default select example">
+                    @foreach (var item in categorys)
+                    {
+                        if (item.Id == Model.ItemCategory.Id)
+                        {
+                            <option selected value="@item.Id">@item.Title</option>
+                        }
+                        else
+                        {
+                            <option value="@item.Id">@item.Title</option>
+                        }
+
+                    }
+                </select>
+            </div>
+           
+
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" /> |
+                <a class="btn btn-primary" href="@Url.Action("ItemAdministration", "Admin")">
+                    Return<span class='bi bi-arrow-return-left'></span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-return-left" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M14.5 1.5a.5.5 0 0 1 .5.5v4.8a2.5 2.5 0 0 1-2.5 2.5H2.707l3.347 3.346a.5.5 0 0 1-.708.708l-4.2-4.2a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 8.3H12.5A1.5 1.5 0 0 0 14 6.8V2a.5.5 0 0 1 .5-.5z" />
+                    </svg>
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    }
